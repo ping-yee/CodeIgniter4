@@ -168,6 +168,13 @@ class Validation implements ValidationInterface
             }
 
             if (strpos($field, '*') !== false) {
+                // $field is string (23) "contacts.friends.*.name", Rule field.
+
+                // dd($rules);
+                if (in_array('required', $rules, true) === true) {
+                    dd($data, $field);
+                }
+                // dd($data);
                 $values = array_filter(array_flatten_with_dots($data), static fn ($key) => preg_match(
                     '/^'
                     . str_replace(['\.\*', '\*\.'], ['\..+', '.+\.'], preg_quote($field, '/'))
@@ -175,6 +182,8 @@ class Validation implements ValidationInterface
                     $key
                 ), ARRAY_FILTER_USE_KEY);
                 // if keys not found
+
+                // dd($values);
                 $values = $values ?: [$field => null];
             } else {
                 $values = dot_array_search($field, $data);
@@ -189,7 +198,17 @@ class Validation implements ValidationInterface
 
             if (strpos($field, '*') !== false) {
                 // Process multiple fields
+
+                // dd(array_flatten_with_dots($data));
+
+                $values['contacts.friends.1.name'] = null;
+
                 foreach ($values as $dotField => $value) {
+                    // dd($field);
+                    // $values array(1) => contacts.friends.0.name => string (14) "Fred Flinstone"
+                    // $rules array(1) => 0 => string (8) "required"
+                    // $data splited data
+                    // $field => contacts.friends.*.name
                     $this->processRules($dotField, $setup['label'] ?? $field, $value, $rules, $data, $field);
                 }
             } else {
@@ -277,6 +296,7 @@ class Validation implements ValidationInterface
             return true;
         }
 
+        // dd($value);
         foreach ($rules as $i => $rule) {
             $isCallable = is_callable($rule);
 
@@ -290,6 +310,11 @@ class Validation implements ValidationInterface
 
             // Placeholder for custom errors from the rules.
             $error = null;
+
+            // $values array(1) => contacts.friends.0.name => string (14) "Fred Flinstone"
+            // $rules array(1) => 0 => string (8) "required"
+            // $data splited data
+            // $field => contacts.friends.*.name
 
             // If it's a callable, call and get out of here.
             if ($this->isClosure($rule)) {
@@ -309,7 +334,6 @@ class Validation implements ValidationInterface
                     $passed = $param === false
                         ? $set->{$rule}($value, $error)
                         : $set->{$rule}($value, $param, $data, $error, $field);
-
                     break;
                 }
 
