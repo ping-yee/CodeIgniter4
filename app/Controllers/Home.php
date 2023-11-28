@@ -8,6 +8,7 @@ class Home extends BaseController
     {
         $a = "test1";
         $a = "test2";
+        $a = "test3";
         return view('welcome_message');
     }
 }
