@@ -54,6 +54,8 @@ class TestHandler extends \CodeIgniter\Log\Handlers\FileHandler
     {
         $date = date($this->dateFormat);
 
+        var_dump("test");
+
         self::$logs[] = strtoupper($level) . ' - ' . $date . ' --> ' . $message;
 
         return true;
